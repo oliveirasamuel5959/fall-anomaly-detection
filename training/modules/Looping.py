@@ -19,6 +19,12 @@ from modules.Plot import plot_activity, plot_data_distribution
 from modules.FeatureEng import sampling_rate, convert_units
 from modules.TimeSeriesData import create_adl_fault_to_repetition
 from modules.Metrics import save_history_and_plots
+from modules.Metrics import plot_confusion_matrix
+from modules.Metrics import compute_metrics_and_confmat
+from modules.Metrics import save_metrics
+from modules.Metrics import save_model_architecture
+
+from utils.labels import ACTIVITY_CODES
 
 # Looping de treino
 
@@ -104,6 +110,26 @@ def process_train(
         callbacks=[early_stopping]
     )
     
-    save_history_and_plots(history, output_root, prefix=model_name)
     
+    save_history_and_plots(history, output_root, prefix=model.name)
+    save_model_architecture(model, output_root)
     
+    # --------------------------------------------------------
+    # Evaluate model
+    # --------------------------------------------------------
+    y_probs = model.predict(X_test, verbose=0)
+    y_true_cls = np.argmax(y_test, axis=1)
+    y_pred_cls = np.argmax(y_probs, axis=1)
+    
+    acc, prec, rec, f1, tnr, cm = compute_metrics_and_confmat(y_true=y_true_cls, y_pred=y_pred_cls)
+    
+    metrics_report = {
+        "accuracy": acc,
+        "precision": prec,
+        "true-negative-rate": tnr,
+        "recall": rec,
+        "f1-score": f1
+    }
+    
+    save_metrics(metrics_report, output_dir=output_root)
+    plot_confusion_matrix(cm, labels=ACTIVITY_CODES.keys(), output_dir=output_root)
