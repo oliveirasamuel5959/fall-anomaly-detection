@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import math
 import seaborn as sns
 
-from utils.labels import ACTIVITY_CODES
+from .utils.labels import ACTIVITY_CODES
 
 def plot_data_distribution(data_df, title="Data Distribution"):
     plt.figure(figsize=(10, 6))

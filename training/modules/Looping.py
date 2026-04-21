@@ -1,4 +1,5 @@
 
+import os
 from xml.parsers.expat import model
 
 import tensorflow as tf
@@ -24,14 +25,18 @@ from modules.Metrics import compute_metrics_and_confmat
 from modules.Metrics import save_metrics
 from modules.Metrics import save_model_architecture
 
-from utils.labels import ACTIVITY_CODES
+from .utils.utils import create_output_dir
+from .utils.labels import ACTIVITY_CODES
 
-# Looping de treino
-
+# ---------------------
+# Training loop
+# ---------------------
 def process_train(
     dataset_root, 
     output_root, 
-    model_name="LSTM", 
+    model_name="LSTM",
+    window_size=100,
+    stride=20, 
     learning_rate=0.001, 
     epochs=100, 
     batch_size=64, 
@@ -57,12 +62,10 @@ def process_train(
     
     # plot_data_distribution(df_data, title="Data Distribution for SA01")
     
-    num_samples = len(df_data)
+    # num_samples = len(df_data)
     # plot_activity(df=df_data, activity='D05', from_df='features', num_samples=num_samples, repetition='R05')
     
-    w = 100
-    s = 20
-    X, Y = create_adl_fault_to_repetition(df_data, w, s)
+    X, Y = create_adl_fault_to_repetition(df_data, w=window_size, s=stride)
     
     print(f"Shape of X: {X.shape}")
     print(f"Shape of Y: {Y.shape}")
@@ -91,6 +94,28 @@ def process_train(
     model = build_model(model_name=model_name, learning_rate=learning_rate, X_train=X_train, y_train=y_train)
     print(model.summary())
     
+    # ---------------------------------------------
+    # Define output directory for this training run
+    # ---------------------------------------------
+    output_dir = create_output_dir(output_root)
+    model_save_path = os.path.join(output_dir, f"saved_models")
+    os.makedirs(model_save_path, exist_ok=True)
+    
+    # ---------------------------------------------
+    # Model training with checkpoint and early stopping
+    # ---------------------------------------------
+    checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+        filepath = os.path.join(model_save_path, (
+            f"lstm-epoch_{{epoch:02d}}_"
+            f"valloss_{{val_loss:.4f}}_valacc_{{val_accuracy:.4f}}.h5"
+        )),
+            save_best_only=True,
+            monitor='val_loss',
+            mode='min',
+            verbose=1
+        )
+    
+    
     early_stopping = tf.keras.callbacks.EarlyStopping(
         monitor="val_loss",
         patience=early_stop_patience,
@@ -107,9 +132,8 @@ def process_train(
         epochs=epochs,
         batch_size=batch_size,
         validation_split=0.2,
-        callbacks=[early_stopping]
+        callbacks=[checkpoint_callback, early_stopping]
     )
-    
     
     save_history_and_plots(history, output_root, prefix=model.name)
     save_model_architecture(model, output_root)

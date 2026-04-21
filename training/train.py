@@ -16,10 +16,12 @@ else:
 # Configurations
 MODEL_NAME = 'LSTM'
 LEARNING_RATE = 0.001
-EPOCHS = 100
+EPOCHS = 10
 BATCH_SIZE = 32
 EARLY_STOP_PATIENCE = 10
 SEED = 42
+WINDOW_SIZE = 200
+STRIDE = 20
 
 ROOT = Path.cwd().parent
 
@@ -37,7 +39,9 @@ def main():
   process_train(
     dataset_root=dataset_root, 
     output_root=OUTPUT_ROOT, 
-    model_name=MODEL_NAME, 
+    model_name=MODEL_NAME,
+    window_size=WINDOW_SIZE,
+    stride=STRIDE, 
     learning_rate=LEARNING_RATE, 
     epochs=EPOCHS, 
     batch_size=BATCH_SIZE, 

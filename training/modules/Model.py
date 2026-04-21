@@ -14,7 +14,7 @@ def build_model(model_name="LSTM", learning_rate=0.001, X_train=None, y_train=No
   decoded = tf.keras.layers.Dense(y_train.shape[1], activation='softmax')(decoded)
 
   # Define LSTM model
-  lstm_model = tf.keras.models.Model(input_layer, decoded)
+  lstm_model = tf.keras.models.Model(input_layer, decoded, name=f"{model_name}_Fall_Detection")
   
   optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
   

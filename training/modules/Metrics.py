@@ -6,7 +6,7 @@ import seaborn as sns
 import numpy as np
 
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
-from utils.labels import ACTIVITY_CODES
+from .utils.labels import ACTIVITY_CODES
 
 # ------------------------------------
 # Save model architecture to text file
@@ -56,7 +56,7 @@ def save_metrics(metrics_report, output_dir):
 # ------------------------------------
 # Plot and save confusion matrix
 # ------------------------------------
-def plot_confusion_matrix(cm, labels=ACTIVITY_CODES.keys(), output_dir=OUTPUT_TRAIN_PATH):
+def plot_confusion_matrix(cm, labels=ACTIVITY_CODES.keys(), output_dir=None):
   fig, ax = plt.subplots(figsize=(15, 15))
   sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", ax=ax)
 
