@@ -1,5 +1,6 @@
 
 import os
+import time
 from xml.parsers.expat import model
 
 import tensorflow as tf
@@ -108,21 +109,25 @@ def process_train(
     # -----------------------
     # Normalize Data
     # -----------------------
+    
+    # Initialize preprocessor and fit on training data
     preprocessor = DataPreprocessor(scaler_type='standard')
-    X_sc = preprocessor.fit_transform_scaler(X_train_seq)
+    X_train = preprocessor.fit_transform_scaler(X_train_seq)
     
+    # Transform validation and test data using the same scaler
+    X_test = preprocessor.transform_scaler(X_test_seq)
+    X_val = preprocessor.transform_scaler(X_val_seq)
+    
+    # ------------------------
     # One-hot encode labels
-    Y_enc = preprocessor.fit_transform_encoder(y_train_seq)
+    # ------------------------
+    y_train = preprocessor.fit_transform_encoder(y_train_seq)
+    y_val = preprocessor.transform_encoder(y_val_seq)
+    y_test = preprocessor.transform_encoder(y_test_seq)
     
-    X_train, X_test, y_train, y_test = train_test_split(X_sc, Y_enc, test_size=0.2, random_state=42)
-    
-    print("X_train model input shape: ", X_train.shape)
-    print("y_train model input shape: ", y_train.shape)
-
-    print("X_test shape: ", X_test.shape)
-    print("y_test shape: ", y_test.shape)
-    
-    # Model training
+    # ------------------------
+    # MODEL BUILDING
+    # ------------------------
     model = build_model(model_name=model_name, learning_rate=learning_rate, X_train=X_train, y_train=y_train)
     print(model.summary())
     
@@ -151,6 +156,13 @@ def process_train(
         monitor="val_loss",
         patience=early_stop_patience,
     )
+    
+    lr_scheduler = tf.keras.callbacks.ReduceLROnPlateau(
+        monitor='val_loss',
+        factor=0.1,
+        patience=15,
+        min_lr=1e-5
+    )
 
     model.compile(
         loss='categorical_crossentropy',
@@ -158,19 +170,25 @@ def process_train(
         metrics=['accuracy']
     )
 
+    time_start = time.time()
     history = model.fit(
         X_train, y_train,
+        validation_data=(X_val, y_val),
         epochs=epochs,
+        shuffle=True,
         batch_size=batch_size,
-        validation_split=0.2,
-        callbacks=[checkpoint_callback, early_stopping]
+        callbacks=[early_stopping, lr_scheduler, checkpoint_callback]
     )
+
+    time_end = time.time()
+    training_time = time_end - time_start
+    print(f"Training time: {training_time:.2f} seconds")
     
     save_history_and_plots(history, output_root, prefix=model.name)
     save_model_architecture(model, output_root)
     
     # --------------------------------------------------------
-    # Evaluate model
+    # MODEL EVALUATION
     # --------------------------------------------------------
     y_probs = model.predict(X_test, verbose=0)
     y_true_cls = np.argmax(y_test, axis=1)
