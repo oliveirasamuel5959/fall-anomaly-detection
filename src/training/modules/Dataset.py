@@ -1,7 +1,8 @@
 import os
 import pandas as pd
+import numpy as np
 
-from random import shuffle
+from sklearn.utils import shuffle
 from tqdm import tqdm
 
 def list_subject_data(subject, DATA_DIR):
@@ -11,7 +12,7 @@ def list_subject_data(subject, DATA_DIR):
   # filter for files with .ini extension, which are invalid activity codes
   for f in files:
     if f.split(".")[1] == 'ini':
-      print(f"File {f} has an invalid activity code and will be skipped.")
+      # print(f"File {f} has an invalid activity code and will be skipped.")
       files.remove(f)
   return files
 
@@ -22,8 +23,7 @@ def load_fall_detection_data(subject=None, my_seed=42, DATA_DIR=None, ACTIVITY_C
 
   subject_data_list = list_subject_data(subject=subject, DATA_DIR=DATA_DIR)
 
-  data_shuffled = subject_data_list.copy()
-  shuffle(data_shuffled, random=my_seed)
+  data_shuffled = shuffle(subject_data_list, random_state=my_seed)
 
   pbar = tqdm(range(len(data_shuffled)), desc='STARTING')
 
@@ -40,7 +40,7 @@ def load_fall_detection_data(subject=None, my_seed=42, DATA_DIR=None, ACTIVITY_C
       continue
 
     # Assign variables to progress bar
-    pbar.set_description(f"LOADING DATA: CODE {activity_code} - REPETITION {repetition}")
+    pbar.set_description(f"LOADING {subject} DATA: CODE {activity_code} - REPETITION {repetition}")
 
     # Define waw data absolute path for pd reading csv
     raw_data_path = os.path.join(DATA_DIR, f"{subject}/{raw_data}")

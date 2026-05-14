@@ -24,8 +24,6 @@ from src.training.modules.Model import build_model
 from src.training.modules.Plot import plot_activity
 from src.training.modules.Plot import plot_data_distribution
 
-# from src.training.modules.FeatureEng import sampling_rate
-# from src.training.modules.FeatureEng import convert_units
 from src.training.modules.FeatureEng import feature_engineering
 from src.training.modules.TimeSeriesData import create_data_repetition
 from src.training.modules.Metrics import save_history_and_plots
@@ -38,6 +36,10 @@ from src.training.modules.utils.labels import ACTIVITY_CODES
 from src.training.modules.utils.utils import create_output_dir
 
 from src.training.modules.Processing import DataPreprocessor
+
+from src.core.logger import get_logger
+
+logger = get_logger(__name__)
 
 # ---------------------
 # Training loop
@@ -54,49 +56,71 @@ def process_train(
     early_stop_patience=10, 
     my_seed=42):
     
+    # -------------------------------------
+    # Set random seeds for reproducibility
+    # -------------------------------------
     tf.keras.utils.set_random_seed(my_seed)
     tf.random.set_seed(my_seed)
     np.random.seed(my_seed)
     random.seed(my_seed)
     
+    # -------------------------------
+    # Define dataset and output paths
+    # -------------------------------
     dataset_root = Path(dataset_root)
     output_root = Path(output_root)
     
     # ---------------------
     # Load dataset
     # ---------------------
+    logger.info("Loading dataset...")
+    
     train_df = load_train_data(my_seed=my_seed, DATA_DIR=dataset_root, ACTIVITY_CODES=ACTIVITY_CODES)
+    logger.info("Train data loaded successfully")
+    
     val_df = load_val_data(my_seed=my_seed, DATA_DIR=dataset_root, ACTIVITY_CODES=ACTIVITY_CODES)
+    logger.info("Validation data loaded successfully")
+    
     test_df = load_test_data(my_seed=my_seed, DATA_DIR=dataset_root, ACTIVITY_CODES=ACTIVITY_CODES)
+    logger.info("Test data loaded successfully")
     
     # ---------------------
     # Feature engineering 
     # and data preparation
     # ---------------------
+    logger.info("Starting feature engineering and data preparation...")
     FEATURE_COLUMNS, train_df, val_df, test_df = feature_engineering(train_df, val_df, test_df, method="base")
+    logger.info("Feature engineering completed successfully")
 
     # ----------------------
     # Create window sequences for 
     # train, val and test data
     # ----------------------
-    X_train_seq, y_train_seq = create_data_repetition(data_type="train", df=train_df, w=window_size, s=stride, feature_columns=FEATURE_COLUMNS)
-    X_val_seq, y_val_seq = create_data_repetition(data_type="val", df=val_df, w=window_size, s=stride, feature_columns=FEATURE_COLUMNS)
-    X_test_seq, y_test_seq = create_data_repetition(data_type="test", df=test_df, w=window_size, s=stride, feature_columns=FEATURE_COLUMNS)
+    logger.info("Creating window sequences for train, validation and test data...")
     
+    X_train_seq, y_train_seq = create_data_repetition(data_type="train", df=train_df, w=window_size, s=stride, feature_columns=FEATURE_COLUMNS)
+    logger.info("Train window sequences created successfully")
+    
+    X_val_seq, y_val_seq = create_data_repetition(data_type="val", df=val_df, w=window_size, s=stride, feature_columns=FEATURE_COLUMNS)
+    logger.info("Validation window sequences created successfully")
+    
+    X_test_seq, y_test_seq = create_data_repetition(data_type="test", df=test_df, w=window_size, s=stride, feature_columns=FEATURE_COLUMNS)
+    logger.info("Test window sequences created successfully")
+    logger.info("Window sequences created successfully")
     # -----------------------
     # Print shapes and class 
     # distribution of window sequences
     # -----------------------
-    print("X_train window sequences shape: ", X_train_seq.shape)
-    print("y_train window sequences shape: ", y_train_seq.shape)
-    print("X_val window sequences shape: ", X_val_seq.shape)
-    print("y_val window sequences shape: ", y_val_seq.shape)
-    print("X_test window sequences shape: ", X_test_seq.shape)
-    print("y_test window sequences shape: ", y_test_seq.shape)
+    logger.info("X_train window sequences shape: %s", X_train_seq.shape)
+    logger.info("y_train window sequences shape: %s", y_train_seq.shape)
+    logger.info("X_val window sequences shape: %s", X_val_seq.shape)
+    logger.info("y_val window sequences shape: %s", y_val_seq.shape)
+    logger.info("X_test window sequences shape: %s", X_test_seq.shape)
+    logger.info("y_test window sequences shape: %s", y_test_seq.shape)
     
-    print(np.unique(y_train_seq, return_counts=True))
-    print(np.unique(y_val_seq, return_counts=True))
-    print(np.unique(y_test_seq, return_counts=True))
+    logger.info("y_train class distribution: %s", np.unique(y_train_seq, return_counts=True))
+    logger.info("y_val class distribution: %s", np.unique(y_val_seq, return_counts=True))
+    logger.info("y_test class distribution: %s", np.unique(y_test_seq, return_counts=True))
     
     # -----------------------
     # Shuffle training data
@@ -105,11 +129,11 @@ def process_train(
 
     X_train_seq = X_train_seq[idx]
     y_train_seq = y_train_seq[idx]
-    
+    logger.info("Training data shuffled successfully")
     # -----------------------
     # Normalize Data
     # -----------------------
-    
+    logger.info("Starting data normalization...")
     # Initialize preprocessor and fit on training data
     preprocessor = DataPreprocessor(scaler_type='standard')
     X_train = preprocessor.fit_transform_scaler(X_train_seq)
@@ -117,6 +141,7 @@ def process_train(
     # Transform validation and test data using the same scaler
     X_test = preprocessor.transform_scaler(X_test_seq)
     X_val = preprocessor.transform_scaler(X_val_seq)
+    logger.info("Data normalization completed successfully")
     
     # ------------------------
     # One-hot encode labels
@@ -129,7 +154,8 @@ def process_train(
     # MODEL BUILDING
     # ------------------------
     model = build_model(model_name=model_name, learning_rate=learning_rate, X_train=X_train, y_train=y_train)
-    print(model.summary())
+    logger.info("Model built successfully")
+    logger.info("Model summary:\n%s", model.summary())
     
     # ---------------------------------------------
     # Define output directory for this training run
@@ -182,7 +208,7 @@ def process_train(
 
     time_end = time.time()
     training_time = time_end - time_start
-    print(f"Training time: {training_time:.2f} seconds")
+    logger.info("Training time: %.2f seconds", training_time)
     
     save_history_and_plots(history, output_root, prefix=model.name)
     save_model_architecture(model, output_root)
@@ -205,4 +231,5 @@ def process_train(
     }
     
     save_metrics(metrics_report, output_dir=output_root)
+    logger.info("Metrics saved successfully")
     plot_confusion_matrix(cm, labels=ACTIVITY_CODES.keys(), output_dir=output_root)
