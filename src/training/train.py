@@ -19,8 +19,8 @@ EPOCHS = 10
 BATCH_SIZE = 32
 EARLY_STOP_PATIENCE = 10
 SEED = 42
-WINDOW_SIZE = 200
-STRIDE = 20
+WINDOW_SIZE = 600
+STRIDE = 200
 
 ROOT = Path.cwd().parent
 ROOT = ROOT / "fall-anomaly-detection"

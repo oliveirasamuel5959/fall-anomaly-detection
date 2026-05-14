@@ -18,10 +18,10 @@ def build_model(model_name="LSTM", learning_rate=0.001, X_train=None, y_train=No
   # x = tf.keras.layers.BatchNormalization()(x)
   # x = tf.keras.layers.Dropout(0.2)(x)
 
-  output = tf.keras.layers.Dense(2, activation='softmax')(x)
+  output = tf.keras.layers.Dense(y_train.shape[1], activation='softmax')(x)
 
   # Define LSTM model
-  lstm_model = tf.keras.models.Model(input_layer, output, name="LSTM_Fall_Detection")
+  lstm_model = tf.keras.models.Model(input_layer, output, name=f"{model_name}_Fall_Detection")
   
   optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
   

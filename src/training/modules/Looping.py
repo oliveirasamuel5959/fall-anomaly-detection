@@ -37,7 +37,7 @@ from src.training.modules.utils.utils import create_output_dir
 
 from src.training.modules.Processing import DataPreprocessor
 
-from src.core.logger import get_logger
+from src.core.logger import get_logger, log_task
 
 logger = get_logger(__name__)
 
@@ -96,16 +96,15 @@ def process_train(
     # Create window sequences for 
     # train, val and test data
     # ----------------------
-    logger.info("Creating window sequences for train, validation and test data...")
+    with log_task("Creating window sequences for train", "Train window sequences created successfully"):
+        X_train_seq, y_train_seq = create_data_repetition(data_type="train", df=train_df, w=window_size, s=stride, feature_columns=FEATURE_COLUMNS)
     
-    X_train_seq, y_train_seq = create_data_repetition(data_type="train", df=train_df, w=window_size, s=stride, feature_columns=FEATURE_COLUMNS)
-    logger.info("Train window sequences created successfully")
+    with log_task("Creating window sequences for validation", "Validation window sequences created successfully"):
+        X_val_seq, y_val_seq = create_data_repetition(data_type="train", df=val_df, w=window_size, s=stride, feature_columns=FEATURE_COLUMNS)
     
-    X_val_seq, y_val_seq = create_data_repetition(data_type="val", df=val_df, w=window_size, s=stride, feature_columns=FEATURE_COLUMNS)
-    logger.info("Validation window sequences created successfully")
-    
-    X_test_seq, y_test_seq = create_data_repetition(data_type="test", df=test_df, w=window_size, s=stride, feature_columns=FEATURE_COLUMNS)
-    logger.info("Test window sequences created successfully")
+    with log_task("Creating window sequences for test", "Test window sequences created successfully"):
+        X_test_seq, y_test_seq = create_data_repetition(data_type="train", df=test_df, w=window_size, s=stride, feature_columns=FEATURE_COLUMNS)
+
     logger.info("Window sequences created successfully")
     # -----------------------
     # Print shapes and class 
@@ -149,6 +148,11 @@ def process_train(
     y_train = preprocessor.fit_transform_encoder(y_train_seq)
     y_val = preprocessor.transform_encoder(y_val_seq)
     y_test = preprocessor.transform_encoder(y_test_seq)
+    logger.info("One-hot encoding labels successfully")
+    
+    logger.info("Final shapes after preprocessing:")
+    logger.info("X_train shape: %s", X_train.shape)
+    logger.info("y_train shape: %s", y_train.shape)
     
     # ------------------------
     # MODEL BUILDING
@@ -196,6 +200,7 @@ def process_train(
         metrics=['accuracy']
     )
 
+    logger.info("Model training Start")
     time_start = time.time()
     history = model.fit(
         X_train, y_train,
