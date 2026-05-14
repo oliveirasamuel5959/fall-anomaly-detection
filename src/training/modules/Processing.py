@@ -18,9 +18,9 @@ class DataPreprocessor:
         self.encoder = OneHotEncoder(sparse_output=False, handle_unknown='ignore')
     
     def fit_transform_scaler(self, X_train):
-        X_train = X_train.reshape(-1, X_train.shape[-1])
-        self.scaler.fit(X_train)
-        X_scaled = self.scaler.transform(X_train).reshape(X_train.shape)
+        X_train_flat = X_train.reshape(-1, X_train.shape[-1])
+        self.scaler.fit(X_train_flat)
+        X_scaled = self.scaler.transform(X_train_flat).reshape(X_train.shape)
         return X_scaled
         
     def transform_scaler(self, X):

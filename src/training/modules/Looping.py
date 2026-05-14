@@ -138,8 +138,9 @@ def process_train(
     X_train = preprocessor.fit_transform_scaler(X_train_seq)
     
     # Transform validation and test data using the same scaler
-    X_test = preprocessor.transform_scaler(X_test_seq)
     X_val = preprocessor.transform_scaler(X_val_seq)
+    X_test = preprocessor.transform_scaler(X_test_seq)
+    
     logger.info("Data normalization completed successfully")
     
     # ------------------------
