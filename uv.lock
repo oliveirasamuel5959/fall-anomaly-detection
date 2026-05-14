@@ -17,6 +17,9 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 
+[manifest]
+overrides = [{ name = "tensorflow-io-gcs-filesystem", marker = "sys_platform != 'win32'" }]
+
 [[package]]
 name = "absl-py"
 version = "2.4.0"
@@ -708,7 +711,7 @@ wheels = [
 [[package]]
 name = "fall-detection"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "black" },
     { name = "matplotlib" },
@@ -3451,7 +3454,7 @@ dependencies = [
     { name = "setuptools" },
     { name = "six" },
     { name = "tensorboard" },
-    { name = "tensorflow-io-gcs-filesystem", marker = "python_full_version < '3.12'" },
+    { name = "tensorflow-io-gcs-filesystem", marker = "sys_platform != 'win32'" },
     { name = "termcolor" },
     { name = "typing-extensions" },
     { name = "wrapt" },
