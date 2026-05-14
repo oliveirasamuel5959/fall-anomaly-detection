@@ -5,16 +5,23 @@ def build_model(model_name="LSTM", learning_rate=0.001, X_train=None, y_train=No
   input_layer = tf.keras.layers.Input(shape=(X_train.shape[1], X_train.shape[2]))
 
   # Define encoder layers
-  encoded = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(128, activation='tanh', return_sequences=True))(input_layer)
-  encoded = tf.keras.layers.LSTM(128, activation='tanh')(encoded)
+  # x = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(50, activation='tanh', return_sequences=True))(input_layer)
+  x = tf.keras.layers.LSTM(64, activation='tanh', return_sequences=True)(input_layer)
+  x = tf.keras.layers.BatchNormalization()(x)
+  x = tf.keras.layers.Dropout(0.3)(x)
+  x = tf.keras.layers.LSTM(64, activation='tanh', return_sequences=False)(x)
+  x = tf.keras.layers.BatchNormalization()(x)
+  x = tf.keras.layers.Dropout(0.2)(x)
 
-  # Define decoders layers
-  decoded = tf.keras.layers.Dense(300, activation='relu')(encoded)
-  decoded = tf.keras.layers.Dropout(0.5)(decoded)
-  decoded = tf.keras.layers.Dense(y_train.shape[1], activation='softmax')(decoded)
+  # Define decode layers
+  # x = tf.keras.layers.Dense(16, activation='relu')(x)
+  # x = tf.keras.layers.BatchNormalization()(x)
+  # x = tf.keras.layers.Dropout(0.2)(x)
+
+  output = tf.keras.layers.Dense(2, activation='softmax')(x)
 
   # Define LSTM model
-  lstm_model = tf.keras.models.Model(input_layer, decoded, name=f"{model_name}_Fall_Detection")
+  lstm_model = tf.keras.models.Model(input_layer, output, name="LSTM_Fall_Detection")
   
   optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
   
@@ -26,4 +33,4 @@ def build_model(model_name="LSTM", learning_rate=0.001, X_train=None, y_train=No
 
   return lstm_model
   
-print("Model module loaded successfully.")
+print(f"[OK] Model module loaded successfully.")

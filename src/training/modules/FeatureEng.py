@@ -1,28 +1,32 @@
 import numpy as np
 import pandas as pd
 
-def convert_units(df):
-  
-    ADC_13_BITS = 8192.0
-    ADC_14_BITS = 16384.0
-    ADC_16_BITS = 65536.0
-    RANGE_ACC = 16
-    RANGE_GYRO = 2000
-    
-    df_copy = df.copy()
+ADC_13_BITS = 8192.0
+ADC_16_BITS = 65536.0
+RANGE_ACC = 16
+RANGE_GYRO = 2000
 
+def convert_sisfall_units(df):
+    df_copy = df.copy()
     acc_cols = ["AccX", "AccY", "AccZ"]
     gyro_cols = ["GyroX", "GyroY", "GyroZ"]
 
     # Convert accelerometer to g
     df_copy[acc_cols] = ((2 * RANGE_ACC) / (ADC_13_BITS)) * df_copy[acc_cols]
+    df_copy[gyro_cols] = ((2 * RANGE_GYRO) / (ADC_16_BITS)) * df_copy[gyro_cols]
 
     # Convert gyroscope to rad/s
-    df_copy[gyro_cols] = ((2 * RANGE_GYRO) / (ADC_16_BITS)) * df_copy[gyro_cols]
-    # df[gyro_cols] = df[gyro_cols] * (180.0 / np.pi)
-
+    df_copy[gyro_cols] = df_copy[gyro_cols] * (np.pi / 180.0)
     return df_copy
   
+def feature_c1c2(df):
+  df_temp = df.copy()
+  c1 = np.sqrt(df_temp["AccX"]**2 + df_temp["AccY"]**2 + df_temp["AccZ"]**2)
+  c2 = np.sqrt(df_temp["AccX"]**2 + df_temp["AccZ"]**2)
+
+  df_temp.insert(6, "C1", c1, True)
+  df_temp.insert(7, "C2", c2, True)
+  return df_temp
   
 def sampling_rate(df):
   """
@@ -52,3 +56,40 @@ def prepare_timestamp(data_df):
     df = df.sort_values("timestamp")
 
     return df
+  
+def feature_engineering(train_df, val_df, test_df, method="base"):
+  # Featuring Engineering raw data to real physical values
+  train_df = convert_sisfall_units(train_df)
+  test_df = convert_sisfall_units(test_df)
+  val_df = convert_sisfall_units(val_df)
+
+  if method == "base":
+    # time series samplig rate
+    train_df = sampling_rate(train_df)
+    val_df = sampling_rate(val_df)
+    test_df = sampling_rate(test_df)
+    # SA15_df = sampling_rate(SA15_df)
+
+    # Define global feature columns
+    FEATURE_COLUMNS = train_df.columns[:6].to_list()
+
+  elif method == "c1_c2":
+    # Calculate magnitudes of accel and rotations
+    train_df = feature_c1c2(train_df)
+    val_df = feature_c1c2(val_df)
+    test_df = feature_c1c2(test_df)
+    SA15_df = feature_c1c2(SA15_df)
+
+    # time series samplig rate
+    train_df = sampling_rate(train_df)
+    val_df = sampling_rate(val_df)
+    test_df = sampling_rate(test_df)
+    # SA15_df = sampling_rate(SA15_df)
+
+    # Define global feature columns
+    FEATURE_COLUMNS = train_df.columns[:8].to_list()
+
+  else:
+    raise ValueError(f"Invalid feature engineering method: {method}")
+  
+  return FEATURE_COLUMNS, train_df, val_df, test_df
