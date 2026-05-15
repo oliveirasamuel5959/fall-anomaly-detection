@@ -93,3 +93,24 @@ def feature_engineering(train_df, val_df, test_df, method="base"):
     raise ValueError(f"Invalid feature engineering method: {method}")
   
   return FEATURE_COLUMNS, train_df, val_df, test_df
+
+def rotation_matrix(df, theta, axis='z'):
+  df_rot = df.copy()
+
+  if axis == 'z':
+    R = np.array([
+      [np.cos(theta), -np.sin(theta), 0],
+      [np.sin(theta),  np.cos(theta), 0],
+      [0,              0,             1]
+    ])
+  else:
+    raise ValueError("Only 'z' implemented")
+
+  # Apply separately to accel and gyro
+  acc = df_rot[df.columns[1:4]].values
+  gyro = df_rot[df.columns[4:]].values
+
+  df_rot[df.columns[1:4]] = acc @ R.T
+  df_rot[df.columns[4:]] = gyro @ R.T
+
+  return df_rot

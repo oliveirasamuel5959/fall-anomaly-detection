@@ -55,7 +55,7 @@ def plot_activity(df, activity, from_df='features', num_samples=600, repetition=
 
     # ---- LEFT: ACCEL ----
     for col in ["AccX", "AccY", "AccZ"]:
-        axes[0].plot(x_axis, df_k[col], label=col)
+      axes[0].plot(x_axis, df_k[col], label=col)
 
     axes[0].set_xlim(xmin=x_axis.min(), xmax=x_axis.max())
     axes[0].set_title("Acceleration")
@@ -66,7 +66,7 @@ def plot_activity(df, activity, from_df='features', num_samples=600, repetition=
 
     # ---- RIGHT: GYRO ----
     for col in ["GyroX", "GyroY", "GyroZ"]:
-        axes[1].plot(x_axis, df_k[col], label=col)
+      axes[1].plot(x_axis, df_k[col], label=col)
 
     axes[1].set_xlim(xmin=x_axis.min(), xmax=x_axis.max())
     axes[1].set_title("Gyroscope")

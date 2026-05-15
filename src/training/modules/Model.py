@@ -1,4 +1,8 @@
+import h5py
+import json
 import tensorflow as tf
+
+print(tf.__version__)
 
 def build_model(model_name="LSTM", learning_rate=0.001, X_train=None, y_train=None):
   # Define the input layer
@@ -32,5 +36,21 @@ def build_model(model_name="LSTM", learning_rate=0.001, X_train=None, y_train=No
   )
 
   return lstm_model
+
+def load_model(model_path):
+  with h5py.File(model_path, 'r+') as f:
+    model_config = json.loads(f.attrs['model_config'])
+    
+    def remove_key(obj, key):
+      if isinstance(obj, dict):
+        obj.pop(key, None)
+        for v in obj.values():
+          remove_key(v, key)
+      elif isinstance(obj, list):
+        for item in obj:
+          remove_key(item, key)
+    
+    remove_key(model_config, 'quantization_config')
+    f.attrs['model_config'] = json.dumps(model_config)
   
-print(f"[OK] Model module loaded successfully.")
+  return tf.keras.models.load_model(model_path, compile=False)
