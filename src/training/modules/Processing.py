@@ -17,19 +17,19 @@ class DataPreprocessor:
         
         self.encoder = OneHotEncoder(sparse_output=False, handle_unknown='ignore')
     
-    def fit_transform_scaler(self, X_train):
-        X_train_flat = X_train.reshape(-1, X_train.shape[-1])
+    def scaler_fit_transform(self, X):
+        X_train_flat = X.reshape(-1, X.shape[-1])
         self.scaler.fit(X_train_flat)
-        X_scaled = self.scaler.transform(X_train_flat).reshape(X_train.shape)
+        X_scaled = self.scaler.transform(X_train_flat).reshape(X.shape)
         return X_scaled
         
-    def transform_scaler(self, X):
+    def scaler_transform(self, X):
         X_flat = X.reshape(-1, X.shape[-1])
         X_scaled = self.scaler.transform(X_flat).reshape(X.shape)
         return X_scaled
       
-    def fit_transform_encoder(self, y_train):
-        return self.encoder.fit_transform(y_train.reshape(-1, 1))
+    def encoder_fit_transform(self, y):
+        return self.encoder.fit_transform(y.reshape(-1, 1))
         
-    def transform_encoder(self, y):
+    def encoder_transform(self, y):
         return self.encoder.transform(y.reshape(-1, 1))

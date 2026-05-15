@@ -68,3 +68,34 @@
 2026-05-14 16:42:33 | INFO     | src.training.modules.Looping | Final shapes after preprocessing:
 2026-05-14 16:42:33 | INFO     | src.training.modules.Looping | X_train shape: (7583400, 6)
 2026-05-14 16:42:33 | INFO     | src.training.modules.Looping | y_train shape: (12639, 2)
+2026-05-14 21:28:22 | INFO     | src.training.modules.Looping | Loading dataset...
+2026-05-14 21:28:34 | INFO     | src.training.modules.Looping | Train data loaded successfully
+2026-05-14 21:28:42 | INFO     | src.training.modules.Looping | Validation data loaded successfully
+2026-05-14 21:28:48 | INFO     | src.training.modules.Looping | Test data loaded successfully
+2026-05-14 21:28:48 | INFO     | src.training.modules.Looping | Starting feature engineering and data preparation...
+2026-05-14 21:28:49 | INFO     | src.training.modules.Looping | Feature engineering completed successfully
+2026-05-14 21:29:43 | INFO     | src.training.modules.Looping | Window sequences created successfully
+2026-05-14 21:29:43 | INFO     | src.training.modules.Looping | X_train window sequences shape: (7399, 600, 6)
+2026-05-14 21:29:43 | INFO     | src.training.modules.Looping | y_train window sequences shape: (7399,)
+2026-05-14 21:29:43 | INFO     | src.training.modules.Looping | X_val window sequences shape: (4779, 600, 6)
+2026-05-14 21:29:43 | INFO     | src.training.modules.Looping | y_val window sequences shape: (4779,)
+2026-05-14 21:29:43 | INFO     | src.training.modules.Looping | X_test window sequences shape: (4779, 600, 6)
+2026-05-14 21:29:43 | INFO     | src.training.modules.Looping | y_test window sequences shape: (4779,)
+2026-05-14 21:29:43 | INFO     | src.training.modules.Looping | y_train class distribution: (array(['Fall', 'Normal'], dtype='<U6'), array([3151, 4248]))
+2026-05-14 21:29:43 | INFO     | src.training.modules.Looping | y_val class distribution: (array(['Fall', 'Normal'], dtype='<U6'), array([2025, 2754]))
+2026-05-14 21:29:43 | INFO     | src.training.modules.Looping | y_test class distribution: (array(['Fall', 'Normal'], dtype='<U6'), array([2026, 2753]))
+2026-05-14 21:29:43 | INFO     | src.training.modules.Looping | Training data shuffled successfully
+2026-05-14 21:29:43 | INFO     | src.training.modules.Looping | Starting data normalization...
+2026-05-14 21:29:44 | INFO     | src.training.modules.Looping | Data normalization completed successfully
+2026-05-14 21:29:44 | INFO     | src.training.modules.Looping | One-hot encoding labels successfully
+2026-05-14 21:29:44 | INFO     | src.training.modules.Looping | Final shapes after preprocessing:
+2026-05-14 21:29:44 | INFO     | src.training.modules.Looping | X_train shape: (7399, 600, 6)
+2026-05-14 21:29:44 | INFO     | src.training.modules.Looping | y_train shape: (7399, 2)
+2026-05-14 21:29:44 | INFO     | src.training.modules.Looping | Model built successfully
+2026-05-14 21:29:44 | INFO     | src.training.modules.Looping | Model summary:
+None
+2026-05-14 21:29:44 | INFO     | src.training.modules.Looping | Model training Start
+2026-05-14 21:55:39 | INFO     | src.training.modules.Looping | Training time: 1554.29 seconds
+2026-05-14 21:56:12 | INFO     | src.training.modules.Looping | Metrics saved successfully
+2026-05-14 21:57:26 | INFO     | src.training.modules.Looping | Loading dataset...
+2026-05-14 21:57:30 | INFO     | src.training.modules.Looping | Train data loaded successfully

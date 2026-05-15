@@ -67,10 +67,10 @@ def load_train_data(my_seed=42, DATA_DIR=None, ACTIVITY_CODES=None):
   data_01 = load_fall_detection_data('SA01', my_seed=my_seed, DATA_DIR=DATA_DIR, ACTIVITY_CODES=ACTIVITY_CODES)
   data_02 = load_fall_detection_data('SA02', my_seed=my_seed, DATA_DIR=DATA_DIR, ACTIVITY_CODES=ACTIVITY_CODES)
   data_03 = load_fall_detection_data('SA03', my_seed=my_seed, DATA_DIR=DATA_DIR, ACTIVITY_CODES=ACTIVITY_CODES)
-  data_04 = load_fall_detection_data('SA04', my_seed=my_seed, DATA_DIR=DATA_DIR, ACTIVITY_CODES=ACTIVITY_CODES)
-  data_05 = load_fall_detection_data('SA05', my_seed=my_seed, DATA_DIR=DATA_DIR, ACTIVITY_CODES=ACTIVITY_CODES)
+  # data_04 = load_fall_detection_data('SA04', my_seed=my_seed, DATA_DIR=DATA_DIR, ACTIVITY_CODES=ACTIVITY_CODES)
+  # data_05 = load_fall_detection_data('SA05', my_seed=my_seed, DATA_DIR=DATA_DIR, ACTIVITY_CODES=ACTIVITY_CODES)
   
-  train_df = pd.concat([data_01, data_02, data_03, data_04, data_05], ignore_index=True)
+  train_df = pd.concat([data_01, data_02, data_03], ignore_index=True)
   train_df['label'] = np.where(train_df['activity_code'].str.startswith('D'),'Normal','Fall')
   
   # Convert object data to string
@@ -98,9 +98,9 @@ def load_test_data(my_seed=42, DATA_DIR=None, ACTIVITY_CODES=None):
   # Load test data
   data_06 = load_fall_detection_data('SA06', my_seed=my_seed, DATA_DIR=DATA_DIR, ACTIVITY_CODES=ACTIVITY_CODES)
   data_07 = load_fall_detection_data('SA07', my_seed=my_seed, DATA_DIR=DATA_DIR, ACTIVITY_CODES=ACTIVITY_CODES)
-  data_08 = load_fall_detection_data('SA08', my_seed=my_seed, DATA_DIR=DATA_DIR, ACTIVITY_CODES=ACTIVITY_CODES)
+  # data_08 = load_fall_detection_data('SA08', my_seed=my_seed, DATA_DIR=DATA_DIR, ACTIVITY_CODES=ACTIVITY_CODES)
   
-  test_df = pd.concat([data_06, data_07, data_08], ignore_index=True)
+  test_df = pd.concat([data_06, data_07], ignore_index=True)
   test_df['label'] = np.where(test_df['activity_code'].str.startswith('D'),'Normal','Fall')
   
   test_df['activity_code'] = test_df['activity_code'].astype('string')

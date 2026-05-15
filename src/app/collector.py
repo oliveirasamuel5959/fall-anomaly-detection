@@ -2,8 +2,7 @@ import requests
 import time
 import numpy as np
 
-
-URL = "http://192.168.0.15/get?accX&accY&accZ&gyroX&gyroY&gyroZ"
+URL = "http://192.168.0.11/get?accX&accY&accZ&gyroX&gyroY&gyroZ"
 
 def fetch_latest():
   r = requests.get(URL).json()["buffer"]
@@ -15,11 +14,11 @@ def fetch_latest():
 
   return {
     "timestamp": time.time(),
-    "accX": safe_get("accX"),
-    "accY": safe_get("accY"),
-    "accZ": safe_get("accZ"),
-    "gyroX": safe_get("gyroX"),
-    "gyroY": safe_get("gyroY"),
-    "gyroZ": safe_get("gyroZ"),
+    "AccX": safe_get("accX"),
+    "AccY": safe_get("accY"),
+    "AccZ": safe_get("accZ"),
+    "GyroX": safe_get("gyroX"),
+    "GyroY": safe_get("gyroY"),
+    "GyroZ": safe_get("gyroZ"),
   }
   

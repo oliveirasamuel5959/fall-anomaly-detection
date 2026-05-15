@@ -1,4 +1,6 @@
-
+# --------------------
+# Imports
+# --------------------
 import os
 import time
 from xml.parsers.expat import model
@@ -10,19 +12,13 @@ import json
 import math
 from pathlib import Path
 
-from sklearn.preprocessing import StandardScaler
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.model_selection import train_test_split
-
-
-from src.training.modules.Dataset import load_fall_detection_data
+# --------------------
+# Local imports
+# --------------------
 from src.training.modules.Dataset import load_train_data
 from src.training.modules.Dataset import load_val_data
 from src.training.modules.Dataset import load_test_data
 from src.training.modules.Model import build_model
-
-from src.training.modules.Plot import plot_activity
-from src.training.modules.Plot import plot_data_distribution
 
 from src.training.modules.FeatureEng import feature_engineering
 from src.training.modules.TimeSeriesData import create_data_repetition
@@ -129,26 +125,29 @@ def process_train(
     X_train_seq = X_train_seq[idx]
     y_train_seq = y_train_seq[idx]
     logger.info("Training data shuffled successfully")
+    
     # -----------------------
     # Normalize Data
     # -----------------------
     logger.info("Starting data normalization...")
+    
     # Initialize preprocessor and fit on training data
     preprocessor = DataPreprocessor(scaler_type='standard')
-    X_train = preprocessor.fit_transform_scaler(X_train_seq)
+    
+    X_train = preprocessor.scaler_fit_transform(X_train_seq)
     
     # Transform validation and test data using the same scaler
-    X_val = preprocessor.transform_scaler(X_val_seq)
-    X_test = preprocessor.transform_scaler(X_test_seq)
+    X_val = preprocessor.scaler_transform(X_val_seq)
+    X_test = preprocessor.scaler_transform(X_test_seq)
     
     logger.info("Data normalization completed successfully")
     
     # ------------------------
     # One-hot encode labels
     # ------------------------
-    y_train = preprocessor.fit_transform_encoder(y_train_seq)
-    y_val = preprocessor.transform_encoder(y_val_seq)
-    y_test = preprocessor.transform_encoder(y_test_seq)
+    y_train = preprocessor.encoder_fit_transform(y_train_seq)
+    y_val = preprocessor.encoder_transform(y_val_seq)
+    y_test = preprocessor.encoder_transform(y_test_seq)
     logger.info("One-hot encoding labels successfully")
     
     logger.info("Final shapes after preprocessing:")
@@ -216,8 +215,8 @@ def process_train(
     training_time = time_end - time_start
     logger.info("Training time: %.2f seconds", training_time)
     
-    save_history_and_plots(history, output_root, prefix=model.name)
-    save_model_architecture(model, output_root)
+    save_history_and_plots(history, output_dir, prefix=model.name)
+    save_model_architecture(model, output_dir)
     
     # --------------------------------------------------------
     # MODEL EVALUATION
@@ -236,6 +235,6 @@ def process_train(
         "f1-score": f1
     }
     
-    save_metrics(metrics_report, output_dir=output_root)
+    save_metrics(metrics_report, output_dir=output_dir)
     logger.info("Metrics saved successfully")
-    plot_confusion_matrix(cm, labels=ACTIVITY_CODES.keys(), output_dir=output_root)
+    plot_confusion_matrix(cm, labels=["Normal", "Fall"], output_dir=output_dir)
