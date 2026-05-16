@@ -81,5 +81,5 @@ def plot_inference(data_df, fall_windows, title="Inference Data Visualization", 
 
   plt.tight_layout()
   plt.show()
-  logger.info(f"[OK] Timeseries plot saved to {file_path}")
+  logger.info(f"[OK] Inference fall detection windows plot saved to {file_path}")
  
