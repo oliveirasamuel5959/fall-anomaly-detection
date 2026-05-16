@@ -15,7 +15,7 @@ def fetch_latest():
   return {
     "timestamp": time.time(),
     "AccX": safe_get("accX"),
-    "AccY": safe_get("accY"),
+    "AccY": safe_get("accY") - 9.81,  # Remove gravity component from Y-axis
     "AccZ": safe_get("accZ"),
     "GyroX": safe_get("gyroX"),
     "GyroY": safe_get("gyroY"),

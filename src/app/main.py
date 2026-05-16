@@ -44,6 +44,3 @@ while True:
 
   # if len(buffer) == WINDOW_SIZE:
   #   X = preprocess(buffer)
-
-  # 200Hz sample rate
-  time.sleep(0.005)

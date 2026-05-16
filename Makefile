@@ -3,3 +3,6 @@ run-train:
 
 run-inference:
 	uv run src/app/inference.py
+
+run-collector:
+	uv run src/app/main.py
